@@ -1,0 +1,2358 @@
+{
+	"info": {
+		"_postman_id": "851b5116-a30f-4d90-8d34-60afbbb78877",
+		"name": "FABEL REST API",
+		"description": "# 🚀 Тестирование FABLE API 🚀\n\nFABLE API:\n\n1. persons - Бизнес модель пользователя\n    \n2. currency - Валюта\n    \n3. tariffs - Тарифы (fixed, percentage)\n    \n4. companies - Взаимодействие с компанией:  \n    4.1 comission - Комиссия для компании  \n    4.2 companies - Компания  \n    4.3 partners - Партнеры компании  \n    4.4 leads - Лиды компании\n    \n5. auth - аутентификация пользователя\n    \n6. user - техническая модель пользователя\n    \n7. tenant(арендодатель) - для каждого fable есть свой tenant_id. Грубо говоря для каждого tenant'а свой fable\n    \n\n# 💡INFO\n\n## [Fable API](https://api-stage.vedcrm.com/docs#/)\n\n###### [](https://api-stage.vedcrm.com/docs#/)[](https://api-stage.vedcrm.com/docs#/)docs\n\n###### 2LLQFqR5UPmI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "33604847",
+		"_collection_link": "https://www.postman.com/solar-space-746936/workspace/fable/collection/33604847-851b5116-a30f-4d90-8d34-60afbbb78877?action=share&source=collection_link&creator=33604847"
+	},
+	"item": [
+		{
+			"name": "persons",
+			"item": [
+				{
+					"name": "persons/contacts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let contact_id = responseData.contact.id;\r",
+									"pm.environment.set(\"contact_id\", contact_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"communication_channel\": \"telegram\",\r\n  \"value\": \"@{{$randomLoremWord}}\",\r\n  \"person_id\": \"{{person_id}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/persons/contacts"
+					},
+					"response": []
+				},
+				{
+					"name": "persons/contacts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/persons/contacts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"persons",
+								"contacts"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Default value : 20, maximum: 50; minimum: 1; integer",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "55",
+									"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+									"disabled": true
+								},
+								{
+									"key": "person_id__in",
+									"value": "{{person_id}}",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "communication_channel__in",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "order_by",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "persons/contacts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/persons/contacts/{{contact_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "persons/contacts/{person_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/persons/contacts/{{person_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "persons/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let person_id = responseData.person.id;\r",
+									"pm.environment.set(\"person_id\", person_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Возможные коды мобильных операторов в России\r",
+									"let operatorCodes = ['910', '911', '912', '913', '914', '915', '916', '917', '918', '919', '920', '921', '922', '923', '924', '925', '926', '927', '928', '929'];\r",
+									"// Выбор случайного оператора\r",
+									"let randomOperatorCode = operatorCodes[Math.floor(Math.random() * operatorCodes.length)];\r",
+									"// Генерация оставшихся 7 цифр номера\r",
+									"let randomPhoneNumber = Math.floor(1000000 + Math.random() * 9000000);\r",
+									"// Создание полного номера с кодом страны\r",
+									"let random_phone = '+7' + randomOperatorCode + randomPhoneNumber;\r",
+									"\r",
+									"// Сохранение этого числа в переменную для использования в запросе\r",
+									"pm.variables.set(\"random_phone\", random_phone);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"display_name\": \"{{$randomFirstName}}\",\r\n  \"phone\": \"{{random_phone}}\",\r\n  \"email\": \"{{$randomExampleEmail}}\",\r\n  \"password\": \"{{$randomPassword}}\",\r\n  \"user_id\": \"{{user_id}}\",\r\n  \"full_name\": \"{{$randomFullName}}\",\r\n  \"contacts\": [\r\n    {\r\n      \"communication_channel\": \"telegram\",\r\n      \"value\": \"@{{$randomLoremWord}}\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/persons/"
+					},
+					"response": []
+				},
+				{
+					"name": "persons/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/persons/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"persons",
+								""
+							],
+							"query": [
+								{
+									"key": "order_by",
+									"value": null,
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "50",
+									"description": "integer; Default value : 20; maximum: 50, minimum: 0",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": null,
+									"description": "integer; Default value : 0; maximum: 1000, minimum: 0",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "persons/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/persons/{{person_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "persons/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"{{person_id}}\",\r\n  \"full_name\": \"{{$randomFullName}}\",\r\n  \"contacts\": [\r\n    {\r\n      \"communication_channel\": \"telegram\",\r\n      \"value\": \"@{{$randomLoremWord}}\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/persons/{{person_id}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "currency",
+			"item": [
+				{
+					"name": "currencies/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let currency_id = responseData.currency.id;\r",
+									"pm.environment.set(\"currency_id\", currency_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"code\": \"{{$randomAbbreviation}}\",\r\n  \"symbol\": \"{{$randomCurrencySymbol}}\",\r\n  \"name\": \"{{$randomLoremWord}}\",\r\n  \"exchange_rate\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/currencies/"
+					},
+					"response": []
+				},
+				{
+					"name": "currencies/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/currencies/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"currencies",
+								""
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Default value : 20, maximum: 50; minimum: 1; integer ",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+									"disabled": true
+								},
+								{
+									"key": "id__in",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "name__in",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "order_by",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "currencies/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/currencies/{{currency_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "currencies/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"code\": \"{{$randomAbbreviation}}\",\r\n  \"symbol\": \"{{$randomCurrencySymbol}}\",\r\n  \"name\": \"{{$randomLoremWord}}\",\r\n  \"exchange_rate\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/currencies/{{currency_id}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "banks",
+			"item": [
+				{
+					"name": "banks/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.text();\r",
+									"let bank_id = responseData.bank.id;\r",
+									"pm.environment.set(\"bank_id\", bank_id);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"{{$randomFirstName}}\",\r\n  \"swift\": \"ZRMTRUR1XT7\",\r\n  \"iban\": \"B38WORQ8112991259644\",\r\n  \"address\": \"{{$randomLoremWords}}\",\r\n  \"company_id\": \"{{company_id}}\",\r\n  \"contacts\": [\r\n    {\r\n      \"communication_channel\": \"telegram\",\r\n      \"value\": \"@{{$randomLoremWord}}\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/banks/"
+					},
+					"response": []
+				},
+				{
+					"name": "banks/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/banks/?bank_id={{bank_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"banks",
+								""
+							],
+							"query": [
+								{
+									"key": "bank_id",
+									"value": "{{bank_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "banks/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/banks/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"banks",
+								""
+							],
+							"query": [
+								{
+									"key": "id__in",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "name__ilike",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "company_id__isnull",
+									"value": "",
+									"description": "boolean",
+									"disabled": true
+								},
+								{
+									"key": "order_by",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Default value : 20, maximum: 50; minimum: 1; integer ",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "0",
+									"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tariffs",
+			"item": [
+				{
+					"name": "tariffs/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let tariff_id = responseData.tariff.id;\r",
+									"pm.environment.set(\"tariff_id\", tariff_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"tariff\": {\r\n    \"tariff_type\": \"fixed\",\r\n    \"value\": 11.5\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/tariffs/"
+					},
+					"response": []
+				},
+				{
+					"name": "tariffs/",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/tariffs?tariff_id={{tariff_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"tariffs"
+							],
+							"query": [
+								{
+									"key": "tariff_id",
+									"value": "{{tariff_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "tariffs/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/tariffs/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "companies",
+			"item": [
+				{
+					"name": "commision",
+					"item": [
+						{
+							"name": "commission/",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"let commission_id = responseData.commission.id;\r",
+											"pm.environment.set(\"commission_id\", commission_id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"commission\": {\r\n    \"type\": \"fixed\",\r\n    \"value\": {{$randomInt}},\r\n    \"payment_completion_date\": \"2024-09-11T14:01:51.207Z\",\r\n    \"is_active\": {{$randomBoolean}}\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/commission/"
+							},
+							"response": []
+						},
+						{
+							"name": "commission/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/companies/commission/?commission_id={{commission_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"companies",
+										"commission",
+										""
+									],
+									"query": [
+										{
+											"key": "commission_id",
+											"value": "{{commission_id}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "commission/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/companies/commission/{{commission_id}}"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "companies",
+					"item": [
+						{
+							"name": "companies/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": "{{base_url}}/companies/{{company_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "companies/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/companies",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"companies"
+									],
+									"query": [
+										{
+											"key": "search_value",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "company_type",
+											"value": "import",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "5",
+											"description": "Default value : 20, maximum: 50; minimum: 1; integer ",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": "5",
+											"description": "Default value : 0, maximum: 1000; minimum: 0; integer ",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "companies/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"short_name\": \"Лтд1\",\r\n  \"full_legal_name\": \"КДВ Групп\",\r\n  \"inn\": \"1773193591\",\r\n  \"tariff_id\": \"{{tariff_id}}\",\r\n  \"type\": \"import\",\r\n  \"partner_id\": \"{{partner_id}}\",\r\n  \"manager_id\": \"{{manager_id}}\",\r\n  \"ogrn\": \"748445555379\",\r\n  \"okpo\": \"null\",\r\n  \"legal_address\": \"{{$randomLoremSentence}}\",\r\n  \"postal_address\": \"null\",\r\n  \"date_registration\": \"2024-09-18 11:13:51.446\",\r\n  \"main_contact_person\": {\r\n    \"id\": \"{{person_id}}\",\r\n    \"full_name\": \"Иванов Иван Иванович\",\r\n    \"position\": null,\r\n    \"contacts\": [\r\n      {\r\n        \"communication_channel\": \"telegram\",\r\n        \"value\": \"@{{$randomLoremWord}}\"\r\n      }\r\n    ]\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/{{company_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "companies/{company_id}",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/companies/{{create_company_id}}"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "partners",
+					"item": [
+						{
+							"name": "partners/",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"let partner_id = responseData.parter.id;\r",
+											"pm.environment.set(\"partner_id\", partner_id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"company_id\": \"{{company_id}}\",\r\n  \"commission_id\": \"{{commission_id}}\",\r\n  \"partner_id\": \"{{partner_id}}\",\r\n  \"manager_id\": \"{{manager_id}}\",\r\n  \"type\": \"individual\",\r\n  \"inn\": \"7554101302\",\r\n  \"name\": \"Октябрина Артемовна Михева\",\r\n  \"maine_contact_person_id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/partners"
+							},
+							"response": []
+						},
+						{
+							"name": "partners/full-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/companies/partners/full-list?limit=50",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"companies",
+										"partners",
+										"full-list"
+									],
+									"query": [
+										{
+											"key": "id__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "type__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "name__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "manager_id__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "order_by",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "commission__type",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "commission__value__gt",
+											"value": "",
+											"description": "number",
+											"disabled": true
+										},
+										{
+											"key": "commission__value__lt",
+											"value": "",
+											"description": "number",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": "50",
+											"description": "Default value : 20, maximum: 50; minimum: 1; integer "
+										},
+										{
+											"key": "offset",
+											"value": "",
+											"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partners/short-list",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/companies/partners/short-list",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"companies",
+										"partners",
+										"short-list"
+									],
+									"query": [
+										{
+											"key": "id__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "type__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "name__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "manager_id__in",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "order_by",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "commission__type",
+											"value": "",
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "commission__value__gt",
+											"value": "",
+											"description": "number",
+											"disabled": true
+										},
+										{
+											"key": "commission__value__lt",
+											"value": "",
+											"description": "number",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": null,
+											"description": "Default value : 20, maximum: 50; minimum: 1; integer ",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": null,
+											"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "partners/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"company_id\": \"39c3b443-724e-441b-87e9-7cad9b5e0de7\",\r\n  \"commission_id\": \"c948d567-ad9f-4845-afc3-c45bfe7c64d7\",\r\n  \"partner_id\": null,\r\n  \"manager_id\": \"c8952319-d115-4261-b49e-21ce4f3dbb30\",\r\n  \"type\": \"legal_entity\",\r\n  \"inn\": \"3189161220\",\r\n  \"name\": \"ВкусВилл!\",\r\n  \"maine_contact_person_id\": null,\r\n  \"id\": \"f8509c86-9ef3-4eaf-917d-515963a9d747\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/partners"
+							},
+							"response": []
+						},
+						{
+							"name": "partners/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": "{{base_url}}/companies/partners/f8509c86-9ef3-4eaf-917d-515963a9d747"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "leads",
+					"item": [
+						{
+							"name": "leads/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/companies/leads/",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"companies",
+										"leads",
+										""
+									],
+									"query": [
+										{
+											"key": "search_value",
+											"value": null,
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "status_id",
+											"value": null,
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": null,
+											"description": "integer; Default value : 20;maximum: 50; minimum: 1",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": null,
+											"description": "integer; Default value : 0; maximum: 1000; minimum: 0",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "leads/",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"let lead_id = responseData.lead.id;\r",
+											"pm.environment.set(\"lead_id\", lead_id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"tariff_id\": \"{{tariff_id}}\",\r\n  \"partner_id\": null,\r\n  \"manager_id\": \"{{manager_id}}\",\r\n  \"full_legal_name\": \"ТехноПоток\",\r\n  \"inn\": \"6030258696\",\r\n  \"short_name\": \"ТПоток\",\r\n  \"type\": \"import\",\r\n  \"person\": {\r\n    \"full_name\": \"ТехноПоток\",\r\n    \"contacts\": [\r\n      {\r\n        \"communication_channel\": \"telegram\",\r\n        \"value\": \"@tpotok\"\r\n      }\r\n    ]\r\n  }\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/leads/"
+							},
+							"response": []
+						},
+						{
+							"name": "leads/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"inn\": \"6030258696\",\r\n  \"full_legal_name\": \"Тестов Тест111\",\r\n  \"person\": {\r\n    \"id\": \"{{person_id}}\",\r\n    \"full_name\": \"ТестовичИзменен1\",\r\n    \"contacts\": [\r\n      {\r\n        \"communication_channel\": \"telegram\",\r\n        \"value\": \"@{{$randomLoremWord}}\"\r\n      }\r\n    ]\r\n  },\r\n  \"partner_id\": \"{{partner_id}}\",\r\n  \"tariff_id\": \"{{tariff_id}}\",\r\n  \"short_name\": \"string\",\r\n  \"type\": \"import\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/leads/{{lead_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "leads/",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": "{{base_url}}/companies/leads/{{lead_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "statuses",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/companies/leads/statuses"
+							},
+							"response": []
+						},
+						{
+							"name": "set-status/{lead_id}",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"status_id\": \"9a5540d3-8b18-465d-b866-1c0f769c6ec0\",\r\n  \"comment\": \"Test\",\r\n  \"manager_id\": \"{{manager_id}}\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/leads/set-status/{{lead_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "create-company-from-lead/{{lead_id}}",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"let create_company_id = responseData.id;\r",
+											"pm.environment.set(\"create_company_id\", create_company_id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"id\": \"{{lead_id}}\",\r\n  \"tariff\": {\r\n    \"id\": \"{{tariff_id}}\",\r\n    \"value\": \"4\",\r\n    \"tariff_type\": \"fixed\",\r\n    \"created_at\": \"2024-09-18T17:33:27.397Z\",\r\n    \"name\": \"AAA\"\r\n  },\r\n  \"partner\": {\r\n    \"id\": \"{{partner_id}}\",\r\n    \"name\": \"BBB\"\r\n  },\r\n  \"manager\": {\r\n    \"id\": \"{{manager_id}}\",\r\n    \"name\": \"CCC\"\r\n  },\r\n  \"full_legal_name\": \"Брест Минск\",\r\n  \"inn\": \"7541317030\",\r\n  \"short_name\": \"BLR\",\r\n  \"type\": \"import\",\r\n  \"main_contact_person\": {\r\n    \"id\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\r\n    \"full_name\": \"string\",\r\n    \"user_id\": \"50f696d0-8bd2-4e2e-8546-5188fbe6deef\",\r\n    \"contacts\": [\r\n      {}\r\n    ]\r\n  }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "{{base_url}}/companies/leads/create-company-from-lead/{{lead_id}}"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "documents",
+					"item": [
+						{
+							"name": "documents",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/companies/documents",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"companies",
+										"documents"
+									],
+									"query": [
+										{
+											"key": "search_value",
+											"value": null,
+											"description": "string",
+											"disabled": true
+										},
+										{
+											"key": "type",
+											"value": "SWIFT",
+											"description": "string; Available values : SWIFT, ACT_REPORT, PAYMENT_EXECUTION, PAYMENT_ORDER, VBK, RELATIONSHIP_CONTRACT, DEAL_CONTRACT, IMPORT_APPLICATION, EXPORT_APPLICATION, INVOICE, SPECIFICATION, ATTACHMENT, PACKING_LIST, CUSTOMS_DECLARATION, AIR_WAYBILL, PERFORMANCE_BOND",
+											"disabled": true
+										},
+										{
+											"key": "limit",
+											"value": null,
+											"description": "Default value : 20, maximum: 50; minimum: 1; integer",
+											"disabled": true
+										},
+										{
+											"key": "offset",
+											"value": null,
+											"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "documents",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let responseData = pm.response.json();\r",
+											"let document_id = responseData.document.id;\r",
+											"pm.environment.set(\"document_id\", document_id);"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "/C:/Users/marza/Desktop/Слайд-шоу/QPKTgLTsZxg.jpg"
+										},
+										{
+											"key": "file_name",
+											"value": "Chinazes1",
+											"type": "text"
+										},
+										{
+											"key": "lead_id",
+											"value": "{{lead_id}}",
+											"type": "text"
+										},
+										{
+											"key": "type",
+											"value": "RELATIONSHIP_CONTRACT",
+											"type": "text"
+										}
+									]
+								},
+								"url": "{{base_url}}/companies/{{company_id}}/documents"
+							},
+							"response": []
+						},
+						{
+							"name": "documents/{document_id}",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "file",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "file_name",
+											"value": "Chizas",
+											"type": "text"
+										},
+										{
+											"key": "lead_id",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "type",
+											"value": "",
+											"type": "text",
+											"disabled": true
+										}
+									]
+								},
+								"url": "{{base_url}}/companies/documents/{{document_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "documents/{document_id}",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": "{{base_url}}/companies/documents/{{document_id}}"
+							},
+							"response": []
+						},
+						{
+							"name": "{company_id}/documents",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "{{access_token}}"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "{{base_url}}/companies/{{company_id}}/documents"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let access_token= responseData.tokens.access.token;\r",
+									"let refresh_token= responseData.tokens.refresh.token;\r",
+									"let user_id= responseData.user.id;\r",
+									"pm.environment.set(\"access_token\", access_token);\r",
+									"pm.environment.set(\"refresh_token\", refresh_token);\r",
+									"pm.environment.set(\"user_id\", user_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"alex_ivanov@gmail.com\",\r\n  \"password\": \"0101alexivanov\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								""
+							],
+							"query": [
+								{
+									"key": "tenant_id",
+									"value": "{{tenant_id}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "auth/refresh/",
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refresh_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "User-Agent",
+								"value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": "{{base_url}}/auth/refresh/"
+					},
+					"response": []
+				},
+				{
+					"name": "auth/reset-password/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"marzan.mars.js@mail.ru\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/auth/reset-password/"
+					},
+					"response": []
+				},
+				{
+					"name": "auth/reset-password-confirm",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{refresh_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"token\": \"1231\",\r\n  \"new_password\": \"0101Minsk\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/auth/reset-password-confirm/"
+					},
+					"response": []
+				},
+				{
+					"name": "auth/secret/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/auth/secret/"
+					},
+					"response": []
+				},
+				{
+					"name": "auth/change-password/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"current_password\": \"Password123!\",\r\n  \"new_password\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/auth/change-password"
+					},
+					"response": []
+				},
+				{
+					"name": "auth/verify-password/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"password\": \"Password123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/auth/verify-password"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "users/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "tenant_id",
+									"value": "{{tenant_id}}",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "tenant_name",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "display_name",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "is_platform_moderator",
+									"value": "",
+									"description": "booalean",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "",
+									"description": "Default value : 20, maximum: 50; minimum: 1; integer",
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": "",
+									"description": "Default value : 0, maximum: 1000; minimum: 0; integer",
+									"disabled": true
+								},
+								{
+									"key": "order_by",
+									"value": "",
+									"description": "string; Available values : +created_at, +display_name, -created_at, -display_name\n\nDefault value : -created_at",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"display_name\": \"Александр Иванов\",\r\n  \"phone\": \"+375(33)762-45-20\",\r\n  \"email\": \"alex_ivanow@gmail.com\",\r\n  \"password\": \"0101alexivanov\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "tenant_id",
+									"value": "{{tenant_id}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users/test",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"display_name\": \"Александр Иванов\",\r\n  \"phone\": \"+375(33)762-45-20\",\r\n  \"email\": \"alex_ivanov@gmail.com\",\r\n  \"password\": \"0101alexivanov\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/test?tenant_id={{tenant_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"test"
+							],
+							"query": [
+								{
+									"key": "tenant_id",
+									"value": "{{tenant_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users/self/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/users/self/"
+					},
+					"response": []
+				},
+				{
+					"name": "users/{user_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							],
+							"query": [
+								{
+									"key": "user_id",
+									"value": "",
+									"description": "string",
+									"disabled": true
+								},
+								{
+									"key": "tenant_id",
+									"value": null,
+									"description": "string",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "users/{user_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"display_name\": \"Marz111\",\r\n  \"phone\": \"+48462133999\",\r\n  \"email\": \"marzan.mars2@mail.ru\",\r\n  \"password\": \"0404Moscow\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/users/{{user_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "users/{user_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/users/{{user_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "/users/fill-db-with-test-data/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test_today@example.com\",\r\n    \"tenant_name\": \"test_today\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/users/fill-db-with-test-data/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "tenant",
+			"item": [
+				{
+					"name": "/tenants/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/tenants/"
+					},
+					"response": []
+				},
+				{
+					"name": "/tenants/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let tenant_id = responseData.tenant.id;\r",
+									"pm.environment.set(\"tenant_id\", tenant_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Александр Иванов\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/tenants/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "contracts",
+			"item": [
+				{
+					"name": "contracts/contracts/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let contract_id = responseData.deal_contract.id;\r",
+									"pm.environment.set(\"contract_id\", contract_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"number\": \"99999999\",\r\n  \"type\": \"export\",\r\n  \"date_signature\": \"2024-10-18T13:56:22.576\",\r\n  \"delivery_time\": \"2024-10-18T13:56:22.576\",\r\n  \"amount\": \"64853.00\",\r\n  \"credit_limit\": null,\r\n  \"terms\": \"prepayment\",\r\n  \"bank_id\": \"{{bank_id}}\",\r\n  \"manager_id\": \"{{manager_id}}\",\r\n  \"tariff_id\": \"{{tariff_id}}\",\r\n  \"currency_id\": \"{{currency_id}}\",\r\n  \"company_id\": \"{{company_id}}\",\r\n  \"relationship_contract_id\": \"{{relationship_contract_id}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/contracts/contracts/"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/contracts/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/contracts/contracts/"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/contracts/{contract_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/contracts/contracts/{{contract_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/contracts/{contract_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"number\": \"11512922\",\r\n  \"type\": \"export\",\r\n  \"date_signature\": \"2024-09-25T20:12:45.914\",\r\n  \"delivery_time\": \"2024-09-25T20:12:45.914\",\r\n  \"amount\": \"64853.00\",\r\n  \"credit_limit\": null,\r\n  \"terms\": \"prepayment\",\r\n  \"bank_id\": \"{{bank_id}}\",\r\n  \"manager_id\": \"{{manager_id}}\",\r\n  \"tariff_id\": \"{{tariff_id}}\",\r\n  \"currency_id\": \"{{currency_id}}\",\r\n  \"company_id\": \"{{company_id}}\",\r\n  \"relationship_contract_id\": \"{{relationship_contract_id}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/contracts/contracts/{{contract_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/contracts/{contract_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/contracts/contracts/{{contract_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/{contract_id}/documents",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let document_contract_id = responseData.document.id;\r",
+									"pm.environment.set(\"document_contract_id\", document_contract_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/marza/Desktop/Слайд-шоу/QPKTgLTsZxg.jpg"
+								},
+								{
+									"key": "file_name",
+									"value": "Marzzzzz",
+									"type": "text"
+								},
+								{
+									"key": "company_id",
+									"value": "{{company_id}}",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "SWIFT",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/contracts/{{contract_id}}/documents/"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/{contract_id}/documents",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/contracts/{{contract_id}}/documents/"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/documents/{document_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/contracts/documents/{{document_contract_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "contracts/documents/{document_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/marza/Desktop/Слайд-шоу/kot_chernyj_morda_121426_3840x2160.jpg"
+								},
+								{
+									"key": "file_name",
+									"value": "CheckTest",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "RELATIONSHIP_CONTRACT",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{base_url}}/contracts/documents/{{document_contract_id}}"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "applications",
+			"item": [
+				{
+					"name": "applications/",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{base_url}}/applications/"
+					},
+					"response": []
+				},
+				{
+					"name": "applications/",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let responseData = pm.response.json();\r",
+									"let application_id = responseData.application.id;\r",
+									"pm.environment.set(\"application_id\", application_id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"invoice_number\": \"1001050204\",\r\n  \"payment_name\": \"Тестов Тест\",\r\n  \"amount\": \"5000\",\r\n  \"currency_id\": \"{{currency_id}}\",\r\n  \"exchange_rate\": \"99564\",\r\n  \"deposit\": \"497820000\",\r\n  \"fee\": \"11\",\r\n  \"recipient\": \"ТЕСТОООВ\",\r\n  \"recipient_country\": \"Беларусь\",\r\n  \"recipient_city\": \"Минск\",\r\n  \"recipient_iban\": \"RU49PUUG7304221551939\",\r\n  \"bank_swift\": \"JZCQRUCW6QB\",\r\n  \"bank_name\": \"Тест\",\r\n  \"bank_address\": \"п. Киров (Вятка)\",\r\n  \"payment_invoice\": \"1979219996\",\r\n  \"payment_date\": \"2024-10-16T00:00:00\",\r\n  \"swift_translation_reference\": \"PABMRUPT\",\r\n  \"contract_id\": \"{{contract_id}}\",\r\n  \"application_number\": \"21312\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/applications/"
+					},
+					"response": []
+				},
+				{
+					"name": "applications/application-status/{application_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"target_status\": \"new\",\r\n  \"swift_reference\": \"string\",\r\n  \"payment_date\": \"2024-10-09T14:26:28.580Z\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/applications/application-status/{{application_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "applications/{application_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"invoice_number\": \"1001050204\",\r\n  \"payment_name\": \"Тестов Тест\",\r\n  \"amount\": \"5000\",\r\n  \"currency_id\": \"{{currency_id}}\",\r\n  \"exchange_rate\": \"99564\",\r\n  \"deposit\": \"497820000\",\r\n  \"fee\": \"11\",\r\n  \"recipient\": \"ТЕСТОООВ\",\r\n  \"recipient_country\": \"Беларусь\",\r\n  \"recipient_city\": \"Минск\",\r\n  \"recipient_iban\": \"RU49PUUG7304221551939\",\r\n  \"bank_swift\": \"JZCQRUCW6QB\",\r\n  \"bank_name\": \"Тест\",\r\n  \"bank_address\": \"п. Киров (Вятка)\",\r\n  \"payment_invoice\": \"1979219996\",\r\n  \"payment_date\": \"2024-10-16T00:00:00\",\r\n  \"swift_translation_reference\": \"PABMRUPT\",\r\n  \"contract_id\": \"{{contract_id}}\",\r\n  \"application_number\": \"21312\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{base_url}}/applications/{{application_id}}"
+					},
+					"response": []
+				},
+				{
+					"name": "applications/{application_id}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{access_token}}"
+							}
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": "{{base_url}}/applications/{{application_id}}"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
